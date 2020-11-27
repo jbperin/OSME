@@ -1,26 +1,10 @@
 
-; #define via_portb    $0300
-; #define via_porta_hs $0301
-#define via_ddrb     $0302
-#define via_ddra     $0303
-; #define via_t1cl     $0304
-; #define via_t1ch     $0305
 #define via_t1ll     $0306
 #define via_t1lh     $0307
-; #define via_t2cl     $0308
-; #define via_t2ll     $0308
-; #define via_t2ch     $0309
-; #define via_sr       $030A
-#define via_acr      $030B
-; #define via_pcr      $030C
-; #define via_ifr      $030D
-; #define via_ier      $030E
-; #define via_porta    $030F
-
 
 .zero
 
-_kernel_ms .dsb	2
+_kernel_cs .dsb	1
 _kernel_s .dsb	1
 
 .text
@@ -37,7 +21,7 @@ irq_handler:
 
 	jsr task_100Hz
 
-	lda _kernel_ms
+	lda _kernel_cs
 	and #$03
 	bne skipNormalItHandler
 
@@ -64,22 +48,15 @@ irq_handler_done:
 
 task_100Hz:
 .(
-	inc _kernel_ms
-	bne skipHighMs
-	inc _kernel_ms+1
-skipHighMs:
-
-	; If ms == 1000 ($3E8) ms = 0; 
-	lda _kernel_ms
-	cmp #$E8
-	bne not_1Hz
-	lda _kernel_ms+1
-	cmp #$03
+	inc _kernel_cs
+ 
+	lda _kernel_cs
+	cmp #100
 	bne not_1Hz
 
 	lda #0
-	sta _kernel_ms
-	sta _kernel_ms+1
+	sta _kernel_cs
+
 
     inc _kernel_s
     lda _kernel_s
@@ -87,16 +64,15 @@ skipHighMs:
     bne not_minute
     lda #0
     sta _kernel_s
+
 not_minute:
-
 	jsr task_25Hz
-
 	jmp task100hz_done
 
 
 not_1Hz:
 
-	lda _kernel_ms
+	lda _kernel_cs
 	and #$03
 	bne not_25Hz
 
@@ -112,7 +88,6 @@ task100hz_done:
 
 task_25Hz:
 
-task25hz_done:
     rts    
 
 
@@ -130,9 +105,18 @@ _kernelInit:
 	sta it_handler+1
 
 	lda #0
-	sta _kernel_ms
-	sta _kernel_ms+1
+	sta _kernel_cs
+	sta _kernel_cs+1
 	sta _kernel_s
+
+
+	; Since this is an slow process, we set the VIA timer to 
+	; issue interrupts at 25Hz, instead of 100 Hz. This is 
+	; not necessary -- it depends on your needs
+	lda #<40000
+	sta via_t1ll 
+	lda #>40000
+	sta via_t1lh
 
 
 	; Install our own handler
@@ -159,49 +143,3 @@ _kernelEnd:
     rts
 .)
 
-
-
-
-	; php
-	; pha
-	; txa
-	; pha
-	; tya
-	; pha
-
-	; ; This handler runs at 100hz 
-
-	; jsr task_25Hz
-
-	; pla
-	; tay
-	; pla
-	; tax
-	; pla
-	; plp
-
-
-
-; #define timer3_low 	$0276
-; #define timer3_high $0277
-
-
-
-
-; _enterSC:
-; .(
-;     pha
-;     lda #64
-;     sta $030E
-;     pla
-; .)
-;     rts
-    
-; _leaveSC:
-; .(
-;     pha
-;     lda #192
-;     sta $030E
-;     pla
-; .)
-;     rts
