@@ -5,6 +5,6 @@
 ::
 SET OSDKADDR=$600
 SET OSDKNAME=sound
-SET OSDKFILE=main kernel
+SET OSDKFILE= kernel main print 
 
 SET OSDKCOMP=-O2
