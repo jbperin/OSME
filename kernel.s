@@ -1,54 +1,43 @@
 
-#define USE_OSME
-
-
-.zero
-
-_kernel_cs .dsb	1
-_kernel_s .dsb	1
-
-.text
 
 #include "tasks_s.s"
 
-#ifdef USE_OSME
-#include "osme_s.s"
-#endif ;; USE_OSME
+
+.text
+
 
 irq_handler:
-
+	
     ; Save Context
-    pha:txa:pha:tya:pha
+    php:pha
+
+	; sei
 
 	jsr task_100Hz
-
-#ifdef USE_OSME
-    jsr osmePulse
-#endif ;; USE_OSME
 
     ; If we're on a 25 Hz Spot (ie kernel centi second multiple of 4)
 	lda _kernel_cs
 	and #$03
 	bne skipNormalItHandler
 
-        ; Call the System IT Handler
-        ; We won't come back from it
-
-        ; Restore Context
-        pla:tay:pla:tax:pla
+        ; Restore Context before we call the System IT Handler
+        ; Because we won't come back from it
+    
+        pla:plp
 
 jmp_old_handler
 	    jmp 0000
 
 skipNormalItHandler:
 
-    ; If we're on a 25 Hz Spot (ie kernel centi second multiple of 4)
-
-    ; Restore Context
-    pla:tay:pla:tax:pla
 
     ; Acknowledge Interruption
     bit $304
+
+    ; Restore Context
+    pla:plp
+
+	; cli 
 
 	rti
 
@@ -83,14 +72,7 @@ _kernelInit:
 	lda #>irq_handler
 	sta $246
 
-
-#ifdef USE_OSME
-    jsr osmeInit
-#endif ;; USE_OSME
-
-
     cli 
-
     rts
 .)
 

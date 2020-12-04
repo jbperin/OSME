@@ -1,19 +1,37 @@
 
+#define USE_OSME
+
+#ifdef USE_OSME
+#include "osme_s.s"
+#endif ;; USE_OSME
+
+
+.zero
+
+_kernel_cs .dsb	1
+_kernel_s .dsb	1
 
 _50hzFlipFlop   .byt 0
 
+.text
 
 task_100Hz:
 .(
+    ; Save Context
+    ; pha:txa:pha:tya:pha
+
+
+#ifdef USE_OSME
+    jsr osmePulse
+#endif ;; USE_OSME
 
     ; kernelCentiSecond  =  (kernelCentiSecond + 1) % 100
 	inc _kernel_cs
  
 	lda _kernel_cs
-	cmp #100			;; TODO: Optim with an EOR #100 : BNE skip: STA _kernel_cs: skip:
+	eor #100			;; TODO: Optim with an EOR #100 : BNE skip: STA _kernel_cs: skip:
 	bne not_1Hz
 
-	lda #0
 	sta _kernel_cs
 
     jsr task_1Hz
@@ -31,6 +49,9 @@ not_1Hz:
     beq not_50Hz
 
     jsr task_50Hz
+	jsr task_25Hz
+
+	jmp task100hz_done
 
 not_50Hz:
 
@@ -45,12 +66,16 @@ not_25Hz:
 
 
 task100hz_done:
+    ; Restore Context
+    ; pla:tay:pla:tax:pla
+
+
 .)
     rts    
 
 task_50Hz:
 .(
-
+	; jsr _ayUpdate
 .)
     rts    
 

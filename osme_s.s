@@ -58,7 +58,7 @@ _getTempo:
 .)
     rts
 
-osmeInit:
+_osmeInit:
 .(
 
     ;
@@ -146,9 +146,18 @@ task_fraction:
 	inc		_kernel_fraction
 	lda		_kernel_fraction
 	eor		#12
-	bne		taskfraction_done
+	bne		not_beat
 	sta		_kernel_fraction
 	jsr		task_beat
+
+not_beat:
+	lda		_ayReg8
+	beq		soundoff
+	sec
+	sbc		#1
+	sta		_ayReg8
+	jsr 	_ayUpdate
+soundoff:	
 taskfraction_done:
 .)
     rts    

@@ -5,20 +5,20 @@
 
 .zero
 
-_ayReg0      .dsb 1    ; R : 
-_ayReg1      .dsb 1    ; R : 
-_ayReg2      .dsb 1    ; R : 
-_ayReg3      .dsb 1    ; R : 
-_ayReg4      .dsb 1    ; R : 
-_ayReg5      .dsb 1    ; R : 
-_ayReg6      .dsb 1    ; R : 
-_ayReg7      .dsb 1    ; R : 
-_ayReg8      .dsb 1    ; R : 
-_ayReg9      .dsb 1    ; R : 
-_ayReg10     .dsb 1    ; R : 
-_ayReg11     .dsb 1    ; R : 
-_ayReg12     .dsb 1    ; R : 
-_ayReg13     .dsb 1    ; R : 
+_ayReg0      .dsb 1    ; R0  : Chan A Tone Period Fine (LSB)
+_ayReg1      .dsb 1    ; R1  : Chan A Tone Period Coarse (HSB)
+_ayReg2      .dsb 1    ; R2  : Chan B Tone Period Fine (LSB)
+_ayReg3      .dsb 1    ; R3  : Chan B Tone Period Coarse (HSB)
+_ayReg4      .dsb 1    ; R4  : Chan C Tone Period Fine (LSB)
+_ayReg5      .dsb 1    ; R5  : Chan C Tone Period Coarse (HSB)
+_ayReg6      .dsb 1    ; R6  : Noise Period 
+_ayReg7      .dsb 1    ; R7  : Mixer 
+_ayReg8      .dsb 1    ; R8  : Chan A Amplitude 
+_ayReg9      .dsb 1    ; R9  : Chan B Amplitude
+_ayReg10     .dsb 1    ; R10 : Chan C Amplitude
+_ayReg11     .dsb 1    ; R11 : Envelope Period Fine 
+_ayReg12     .dsb 1    ; R12 : Envelope Period Coarse 
+_ayReg13     .dsb 1    ; R13 : Envelope Shape / Cycle 
 
 ; store precalculated values to write in via PCR for latch sequence
 ayLatch_N   .dsb 1
@@ -43,31 +43,33 @@ _ayInit:
     sta _ayReg4 
     sta _ayReg5 
     sta _ayReg6 
-    sta _ayReg7 
     sta _ayReg8 
     sta _ayReg9 
     sta _ayReg10
     sta _ayReg11
     sta _ayReg12
     sta _ayReg13
-    
+
+    lda #$3F    
+    sta _ayReg7 
+   
 _ayUpdate:
 
-    sei
+    ; sei
 
     ;; Save bits 
-    lda     $30F
+    lda     via_pcr
     and     #$11
     sta     ayTmp
 
     ;; Prepare values used in latch sequence of VIA 6522
-    and     #$EE     
+    ora     #$EE     
     sta     ayLatch_N
     lda     ayTmp
-    and     #$EC
+    ora     #$EC
     sta     ayLatch_V
     lda     ayTmp
-    and     #$CC
+    ora     #$CC
     sta     ayUnlatch
 
     ;; Tranfert registers one by one
@@ -101,6 +103,57 @@ _ayUpdate:
     lda #11: LATCH_REG_NUMBER: lda _ayReg11: LATCH_REG_VALUE
     lda #12: LATCH_REG_NUMBER: lda _ayReg12: LATCH_REG_VALUE
     lda #13: LATCH_REG_NUMBER: lda _ayReg13: LATCH_REG_VALUE    
+
+
+;    lda #0 : ldx _ayReg0 : jsr ayWriteRegister
+;    lda #1 : ldx _ayReg1 : jsr ayWriteRegister
+;    lda #2 : ldx _ayReg2 : jsr ayWriteRegister
+;    lda #3 : ldx _ayReg3 : jsr ayWriteRegister
+;    lda #4 : ldx _ayReg4 : jsr ayWriteRegister
+;    lda #5 : ldx _ayReg5 : jsr ayWriteRegister
+;    lda #6 : ldx _ayReg6 : jsr ayWriteRegister
+;    lda #7 : ldx _ayReg7 : jsr ayWriteRegister
+;    lda #8 : ldx _ayReg8 : jsr ayWriteRegister
+;    lda #9 : ldx _ayReg9 : jsr ayWriteRegister
+;    lda #10: ldx _ayReg10: jsr ayWriteRegister
+;    lda #11: ldx _ayReg11: jsr ayWriteRegister
+;    lda #12: ldx _ayReg12: jsr ayWriteRegister
+;    lda #13: ldx _ayReg13: jsr ayWriteRegister
     
-    cli
+
+    ; cli
     rts     
+
+
+; parametre A = register number of 8912
+; parametre X = donnée à transférer
+ayWriteRegister:
+.(
+    PHP              
+    SEI              
+    STA via_porta    
+    TAY              
+    TXA              
+    CPY #$07         
+    BNE WriteToAY_F59D        
+    ORA #$40         
+WriteToAY_F59D:
+    PHA              
+    LDA via_pcr      
+    ORA #$EE         
+    STA via_pcr      
+    AND #$11         
+    ORA #$CC         
+    STA via_pcr      
+    TAX              
+    PLA              
+    STA via_porta    
+    TXA              
+    ORA #$EC         
+    STA via_pcr      
+    AND #$11         
+    ORA #$CC         
+    STA via_pcr      
+    plp
+.)              
+    rts              
