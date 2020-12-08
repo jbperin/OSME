@@ -157,3 +157,40 @@ WriteToAY_F59D:
     plp
 .)              
     rts              
+
+
+;; Compute amplitude command to store in PSG register based on:
+;;  the required volume in register X and consigne in register A
+;; INPUTS :
+;; Consigne in 4 LSB of register A
+;; Volume  in 4 MSB of register X
+;; OUTPUT :
+;; Command in 4 LSB of register A
+;; Destroys registers A and X
+
+compensate:
+.(
+    stx     ayTmp
+    and     ayTmp
+    tax
+    lda     compensAY,x
+.)
+    rts
+
+compensAY 	.byt 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	.byt 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1
+	.byt 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2
+	.byt 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3
+	.byt 0, 0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4
+	.byt 0, 0, 0, 0, 1, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5
+	.byt 0, 0, 0, 1, 2, 3, 3, 4, 4, 5, 5, 5, 5, 6, 6, 6
+	.byt 0, 0, 1, 2, 3, 4, 4, 5, 5, 6, 6, 6, 6, 7, 7, 7
+	.byt 0, 0, 2, 3, 4, 5, 5, 6, 6, 7, 7, 7, 7, 8, 8, 8
+	.byt 0, 1, 3, 4, 5, 6, 6, 7, 7, 8, 8, 8, 8, 9, 9, 9
+	.byt 0, 2, 4, 5, 6, 7, 7, 8, 8, 9, 9, 9, 9, 10, 10, 10
+	.byt 0, 3, 5, 6, 7, 8, 8, 9, 9, 10, 10, 10, 10, 11, 11, 11
+	.byt 0, 4, 6, 7, 8, 9, 9, 10, 10, 11, 11, 11, 11, 12, 12, 12
+	.byt 0, 5, 7, 8, 9, 10, 10, 11, 11, 12, 12, 12, 12, 13, 13, 13
+	.byt 0, 6, 8, 9, 10, 11, 11, 12, 12, 13, 13, 13, 13, 14, 14, 14
+	.byt 0, 7, 9, 10, 11, 12, 12, 13, 13, 14, 14, 14, 14, 15, 15, 15
+
