@@ -1,17 +1,28 @@
 
-
+#include "via.h"
 #include "tasks_s.s"
+
+.zero
+
+; Interruption Context Saving 
+irq_A               .byt 0
+irq_X               .byt 0
+irq_Y               .byt 0
 
 
 .text
 
 
 irq_handler:
+	; sei
 	
     ; Save Context
-    php:pha
+    php
 
-	; sei
+	;Preserve registers 
+	sta irq_A
+	stx irq_X
+	sty irq_Y
 
 	jsr task_100Hz
 
@@ -23,7 +34,12 @@ irq_handler:
         ; Restore Context before we call the System IT Handler
         ; Because we won't come back from it
     
-        pla:plp
+		;Restore Registers 
+		lda irq_A
+		ldx irq_X
+		ldy irq_Y
+
+        plp
 
 jmp_old_handler
 	    jmp 0000
@@ -32,10 +48,18 @@ skipNormalItHandler:
 
 
     ; Acknowledge Interruption
-    bit $304
+    ;bit $304
+
+	;Clear IRQ event 
+	lda via_t1cl 
+
+	;Restore Registers 
+	lda irq_A
+	ldx irq_X
+	ldy irq_Y
 
     ; Restore Context
-    pla:plp
+    plp
 
 	; cli 
 

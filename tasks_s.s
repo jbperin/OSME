@@ -76,6 +76,7 @@ task100hz_done:
 task_50Hz:
 .(
 	; jsr _ayUpdate
+    jsr ReadKeyboard
 .)
     rts    
 

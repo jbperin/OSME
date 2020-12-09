@@ -33,6 +33,34 @@ unsigned char getTempo();
 void setTempo(unsigned char tempo);
 void jbOups();
 
+extern char ReadKey();
+extern char ReadKeyNoBounce() ;
+
+extern char KeyBank[8];
+
+/* Routine to dump the matrix into screen */
+void dump_matrix()
+{
+    char * start;
+    char i,j;
+    char mask=1;
+     
+    start=(char *)(0xbfe0-350);
+    for (j=0;j<8;j++)
+    {
+        for(i=0;i<8;i++)
+            {
+                *start = (KeyBank[j] & mask ? '1' : '0');
+                start--;
+                mask=mask<<1;
+            }
+        
+        mask=1;
+        start+=(48);
+    }
+
+}
+
 void note (){
 // ;                        R0   R1   R2   R3   R4   R5   R6   R7   R10  R11  R12  R13  R14  R15   
 // OUPS_DATA	.byt        $46, $00, $00, $00, $00, $00, $00, $3E, $0F, $00, $00, $BD, $28, $02
@@ -91,6 +119,9 @@ void main()
 		AdvancedPrint(20,0,message);
 		sprintf(message, "%d    ",getTempo());
 		AdvancedPrint(30,0,message);
+
+		dump_matrix();
+
 	}
 
 	kernelEnd();
