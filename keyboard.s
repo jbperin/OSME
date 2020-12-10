@@ -23,7 +23,120 @@ tmprow				.byt 0
 
 
 ; The virtual Key Matrix
-_KeyBank .dsb 8
+_KeyBank            .dsb 8
+oldKeyBank          .dsb 8
+keyCode             .dsb 1
+bank_index          .dsb 1
+
+keyReleased:
+.(
+
+.)
+    rts
+
+keyPressed:
+.(
+
+.)
+    rts
+
+; x: bank idx, y : column index
+keyEvent:
+.(
+    pha: txa: pha: tya: pha
+
+    stx bank_index
+
+    ; keyCode = tab_ascii[X*8 + Y]
+	txa
+	asl
+	asl
+	asl
+	sty tmprow
+	clc
+	adc tmprow
+	tax
+	lda tab_ascii,x
+    sta keyCode
+
+	; keyPressed or key Released ??
+    ldx bank_index
+    lda _KeyBank, X
+    ldy tmprow
+    beq end_column_search
+
+    lsr 
+    dey 
+    beq end_column_search
+    lsr 
+    dey 
+    beq end_column_search
+    lsr 
+    dey 
+    beq end_column_search
+    lsr 
+    dey 
+    beq end_column_search
+    lsr 
+    dey 
+    beq end_column_search
+    lsr 
+    dey 
+    beq end_column_search
+    lsr 
+
+end_column_search
+    and #$01
+    bne eventKeyPressed
+    jsr keyReleased
+    jmp keyevent_done
+eventKeyPressed
+    jsr keyPressed
+
+keyevent_done:
+    pla: tay: pla : tax: pla 
+.)
+    rts
+
+
+pushKeyBank:
+.(
+    ldy     #0
+    lda     _KeyBank,Y: sta     oldKeyBank,Y: iny
+    lda     _KeyBank,Y: sta     oldKeyBank,Y: iny
+    lda     _KeyBank,Y: sta     oldKeyBank,Y: iny
+    lda     _KeyBank,Y: sta     oldKeyBank,Y: iny
+    lda     _KeyBank,Y: sta     oldKeyBank,Y: iny
+    lda     _KeyBank,Y: sta     oldKeyBank,Y: iny
+    lda     _KeyBank,Y: sta     oldKeyBank,Y: iny
+    lda     _KeyBank,Y: sta     oldKeyBank,Y
+.)
+    rts
+
+detectKeyEvent:
+.(
+    ldx     #7
+bank_loop:
+    lda     _KeyBank,X
+    eor     oldKeyBank,X
+    beq     nextBank
+
+    ldy     #$ff
+column_loop:
+    iny
+    lsr
+    bcc     column_loop
+    jsr     keyEvent       ; x: bank idx, y : column index
+    cmp     #0
+    bne     column_loop
+
+nextBank:
+    dex
+    bne     bank_loop
+    jsr     pushKeyBank
+.)
+    rts    
+
 
 ReadKeyboard
 .(

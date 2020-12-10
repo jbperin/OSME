@@ -77,6 +77,7 @@ task_50Hz:
 .(
 	; jsr _ayUpdate
     jsr ReadKeyboard
+    jsr detectKeyEvent
 .)
     rts    
 
