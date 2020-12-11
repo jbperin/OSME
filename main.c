@@ -8,7 +8,7 @@ extern unsigned char 	kernel_s;
 extern unsigned char 	kernel_fraction;
 extern unsigned char 	kernel_beat;
 extern unsigned char 	kernel_tempo;
-
+extern unsigned char 	nbE_keybuf;
 
 extern unsigned char 	ayReg0 ; 
 extern unsigned char 	ayReg1 ; 
@@ -38,6 +38,27 @@ extern char ReadKeyNoBounce() ;
 
 extern char KeyBank[8];
 
+void keyPressed(unsigned char c){
+	printf ("kp: %x, ", c);
+}
+
+void keyReleased(unsigned char c){
+	printf ("kr: %x, ", c);
+
+}
+
+void lsys(){
+	unsigned char c;
+	while (nbE_keybuf != 0) {
+		c=get_keyevent();
+		if (c & 0x80){
+			keyReleased (c & 0x7F);
+		} else {
+			keyPressed (c);
+		}
+	}
+}
+
 /* Routine to dump the matrix into screen */
 void dump_matrix()
 {
@@ -58,7 +79,6 @@ void dump_matrix()
         mask=1;
         start+=(48);
     }
-
 }
 
 void note (){
@@ -105,6 +125,7 @@ void main()
 			tps = kernel_s;
 		}
 
+		lsys();
 
 		// if (ayReg8 != 0) {
 		// 	ayReg8--;
@@ -117,7 +138,7 @@ void main()
 		AdvancedPrint(10,0,message);
 		sprintf(message, "%d.%d   ",kernel_beat,  kernel_fraction);
 		AdvancedPrint(20,0,message);
-		sprintf(message, "%d    ",getTempo());
+		sprintf(message, "%d  %d  ",getTempo(), nbE_keybuf);
 		AdvancedPrint(30,0,message);
 
 		dump_matrix();

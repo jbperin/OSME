@@ -1,3 +1,8 @@
+;;
+;; Circular Buffer 
+;;
+;; Author :  Jean-Baptiste PERIN
+;;
 
 
 #define TEMPLATE 
@@ -51,8 +56,6 @@ noOverload:
         inc         nbE_TEMPLATE
     ; Finsi
 endif:
-
-
 
 .)
     rts

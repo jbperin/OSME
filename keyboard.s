@@ -30,13 +30,16 @@ bank_index          .dsb 1
 
 keyReleased:
 .(
-
+    lda             keyCode
+    ora             #$80        ; add bit 7 to indicate it's a key release
+    jsr             add_keybuf
 .)
     rts
 
 keyPressed:
 .(
-
+    lda             keyCode
+    jsr             add_keybuf
 .)
     rts
 
