@@ -135,7 +135,7 @@ column_loop:
 
 nextBank:
     dex
-    bne     bank_loop
+    bpl     bank_loop
     jsr     pushKeyBank
 .)
     rts    
