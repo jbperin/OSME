@@ -15,90 +15,56 @@ _50hzFlipFlop   .byt 0
 
 .text
 
-task_100Hz:
-.(
-    ; Save Context
-    ; pha:txa:pha:tya:pha
-
-
 #ifdef USE_OSME
-    jsr osmePulse
+#define HASOSME    jsr osmePulse
+#else
+#define HASOSME
 #endif ;; USE_OSME
-
-    ; kernelCentiSecond  =  (kernelCentiSecond + 1) % 100
-	inc _kernel_cs
- 
-	lda _kernel_cs
-	eor #100			;; TODO: Optim with an EOR #100 : BNE skip: STA _kernel_cs: skip:
-	bne not_1Hz
-
-	sta _kernel_cs
-
-    jsr task_1Hz
-	jsr task_50Hz
-	jsr task_25Hz
-
-	jmp task100hz_done
-
-
-not_1Hz:
-
-    lda _50hzFlipFlop
-    eor #1
-    sta _50hzFlipFlop
-    beq not_50Hz
-
-    jsr task_50Hz
-	jsr task_25Hz
-
-	jmp task100hz_done
-
-not_50Hz:
-
-
-	lda _kernel_cs
-	and #$03
-	bne not_25Hz
-
-	jsr task_25Hz
-
-not_25Hz:
-
-
-task100hz_done:
-    ; Restore Context
-    ; pla:tay:pla:tax:pla
-
-
+#define TASK_100Hz :.(:\
+    HASOSME:\
+	inc _kernel_cs:\
+ 	lda _kernel_cs:\
+	eor #100:\
+	bne not_1Hz:\
+	sta _kernel_cs:\
+is1Hz:\
+    TASK_1Hz:\
+	TASK_50Hz:\
+	TASK_25Hz:\
+	jmp task100hz_done:\
+not_1Hz:\
+    lda _50hzFlipFlop:\
+    eor #1:\
+    sta _50hzFlipFlop:\
+    beq not_50Hz:\
+    TASK_50Hz:\
+	TASK_25Hz:\
+	jmp task100hz_done:\
+not_50Hz:\
+	lda _kernel_cs:\
+	and #$03:\
+	bne not_25Hz:\
+	TASK_25Hz:\
+not_25Hz:\
+task100hz_done:\
 .)
-    rts    
 
-task_50Hz:
-.(
-	; jsr _ayUpdate
-    jsr ReadKeyboard
-    jsr detectKeyEvent
+#define TASK_50Hz : .( :\
+    jsr ReadKeyboard:\
+    jsr detectKeyEvent:\
 .)
-    rts    
 
 
-
-task_25Hz:
-.(
-
+#define TASK_25Hz :.(:\
 .)
-    rts    
 
-task_1Hz:
-.(
-    inc _kernel_s
-    lda _kernel_s
-    cmp #60
-    bne task1hz_done
-
-    lda #0
-    sta _kernel_s
-
-task1hz_done:
+#define TASK_1Hz :.(:\
+    inc _kernel_s:\
+    lda _kernel_s:\
+    cmp #60:\
+    bne skip_minute:\
+    lda #0:\
+    sta _kernel_s:\
+skip_minute:\
+task1hz_done:\
 .)
-    rts  

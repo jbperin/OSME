@@ -24,7 +24,7 @@ irq_handler:
 	stx irq_X
 	sty irq_Y
 
-	jsr task_100Hz
+	TASK_100Hz
 
     ; If we're on a 25 Hz Spot (ie kernel centi second multiple of 4)
 	lda _kernel_cs
