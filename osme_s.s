@@ -125,22 +125,6 @@ osmePulseDone:
 .)
 	rts
 
-
-; task_fraction:
-; .(
-; 	lda		_kernel_fraction
-; 	clc
-; 	adc		#1
-; 	sta		_kernel_fraction
-; 	cmp		#12
-; 	bne		taskfraction_done
-; 	lda		#0
-; 	sta		_kernel_fraction
-; 	jsr		task_beat
-; taskfraction_done:
-; .)
-;     rts    
-
 task_fraction:
 .(
 	inc		_kernel_fraction
