@@ -1,5 +1,49 @@
 import matplotlib.pyplot as plt
+import logging
 
+format = "%(asctime)s: %(message)s"
+logging.basicConfig(format=format, level=logging.INFO,
+                    datefmt="%H:%M:%S")
+
+
+START_CHAN_A    = 12 # 9
+START_CHAN_B    = 12 # 12
+START_CHAN_C    = 12 # 15
+
+#FILENAME = 'util/shrtsmp_u8_4k.wav' # 'util/loop_mono_8k_u8pcm.wav' # 
+#OUTPUT_FILENAME = "util/OutVal3.py"
+
+#FILENAME = 'util/one-step_4k_u8pcm.wav' # 'util/loop_mono_8k_u8pcm.wav' # 
+#OUTPUT_FILENAME = "util/OneStep.py"
+
+#FILENAME = 'util/Welcome_8k_u8pcm.wav'
+#OUTPUT_FILENAME = "util/Welcome.py"
+
+#FILENAME = 'util/LetItWhip_8k_u8pcm.wav'
+#OUTPUT_FILENAME = "util/LetItWhip.py"
+
+#FILENAME = 'util/SuperFreak_8k_u8pcm.wav'
+#OUTPUT_FILENAME = "util/SuperFreak.py"
+
+#FILENAME = 'util/one-step_4k_u8pcm.wav'
+#OUTPUT_FILENAME = "util/OneStep.py"
+
+FILENAME = 'util/TheLargeMemory_8k_u8pcm.wav'
+OUTPUT_FILENAME = "util/TheLargeMemory.py"
+
+# Your new sampling rate
+new_rate = 4000 # 8000 #
+
+FREQUENCE_PROCESSEUR = 1000000
+
+NB_CYCLE_01 = 2
+NB_CYCLE_02 = 51
+NB_CYCLE_03 = 51
+
+DELAY_01 = NB_CYCLE_02/FREQUENCE_PROCESSEUR 
+DELAY_02 = NB_CYCLE_03/FREQUENCE_PROCESSEUR 
+
+MAX_LEVEL = 2.225
 NB_VAL = 16
 
 def extractValueSet2(model):
@@ -14,9 +58,6 @@ def extractValueSet3(model):
         for li2 in li:
             allval.extend(li2)
     return allval
-
-
-
 
 
 tab2 = [[ (j, i) for i in range(j, NB_VAL)] for j in range (NB_VAL)]
@@ -60,43 +101,38 @@ for i in range(len(S3)):
         curV3[-1][inp]      = sum([vol [v] for v in list(S3[nxtS3[i][inp]])])
         curV3[-1][inp+16]   = sum([vol [v] for v in list(S3[nxtS3[i][inp+16]])])
         curV3[-1][inp+32]   = sum([vol [v] for v in list(S3[nxtS3[i][inp+32]])])
-print (len(nxtS3), len(curV3[0]))
-
-FILENAME = 'util/shrtsmp_u8_4k.wav' # 'util/loop_mono_8k_u8pcm.wav' #
-# Your new sampling rate
-new_rate = 4000 # 8000 #
+# print (len(nxtS3), len(curV3[0]))
 
 import soundfile as sf
 from scipy import signal, interpolate
 import numpy as np
+
+logging.info  ("READ SOUND FILE")
 
 data, samplerate = sf.read(FILENAME) #,dtype='int16'
 
 nb_sample = len(data)
 period = 1.0/samplerate
 duration = nb_sample*period
-print (samplerate, nb_sample, duration)
-print (min(data), max(data))
-data = (data-min(data))/(max(data)-min(data)) * 1.15;
+# print (samplerate, nb_sample, duration)
+# print (min(data), max(data))
+data = (data-min(data))/(max(data)-min(data)) * MAX_LEVEL;
+
+logging.info  ("RESAMPLE SOUND")
 
 # Resample data
 new_number_of_samples = round(nb_sample * float(new_rate) / samplerate)
 new_data = signal.resample(data, new_number_of_samples)
 
 origtimes = np.linspace(0, duration, new_number_of_samples, endpoint=True)
-print (len(origtimes), origtimes)
-print (len(new_data))
+#print (len(origtimes), origtimes)
+#print (len(new_data))
 
 sound_interpolate = interpolate.interp1d(origtimes, new_data)
 
 #print (data)
-FREQUENCE_PROCESSEUR = 1000000
-NB_CYCLE_01 = 5
-NB_CYCLE_02 = 12
-NB_CYCLE_03 = 14
 
-DELAY_01 = NB_CYCLE_02/FREQUENCE_PROCESSEUR # 10 cycles
-DELAY_02 = NB_CYCLE_03/FREQUENCE_PROCESSEUR # 12 cycles
+logging.info  ("INTERPOLATE SOUND SAMPLE")
 
 new_times=[0]
 for tim in origtimes[1:]:
@@ -112,11 +148,15 @@ dt = [dt1, dt2, dt3];
 
 np_new_times = np.array(new_times)
 
-print (np_new_times)
-print (len(new_times))
+# print (np_new_times)
+# print (len(new_times))
 
 new_sig_data = sound_interpolate(np_new_times)
-print (len(new_sig_data))
+# print (len(new_sig_data))
+
+
+
+logging.info  ("VITERBI ENCODE SOUND")
 
 
 L  = [0] * len(S3);
@@ -127,9 +167,8 @@ It = [1] * len(S3)
 Stt = [[0] * len(np_new_times) for i in range (len(S3))] # uint16(zeros(Ns,N));
 Itt = [[0] * len(np_new_times) for i in range (len(S3))] # uint8(zeros(Ns,N));
 
-
+logging.info  ("FORWARD ")
 import math
-print ("START")
 for t in range(len(np_new_times)):
     Ln = [math.inf]*len(S3);
     for cs in range (len(S3)):
@@ -157,7 +196,12 @@ for t in range(len(np_new_times)):
         Itt[ii][t] = It[ii];
 
 
-print ("L =" , L)
+# print ("L =" , L)
+
+
+
+logging.info  ("BACKWARD ")
+
 # P = uint16(zeros(1,N));
 # I = uint8(zeros(1,N));
 P = [1] * len(np_new_times)
@@ -165,7 +209,7 @@ I = [1] * len(np_new_times)
 
 import operator
 i, l = min(enumerate(L), key=operator.itemgetter(1))
-print (i, l)
+# print (i, l)
 P[len(np_new_times)-1] = Stt[i][len(np_new_times)-1]
 I[len(np_new_times)-1] = Itt[i][len(np_new_times)-1]
 
@@ -180,6 +224,7 @@ for t in range (len(np_new_times)-2,0, -1):
     I[t] = Itt[P[t+1]][t]#Itt[2][t] #
 
 
+logging.info  ("GENERATING OUTPUT")
 
 # V = zeros(1,N);
 # for t = 1:N
@@ -190,10 +235,10 @@ V = [0] * len(np_new_times)
 for t in range (len(np_new_times)):
     V[t] = curV3[P[t]][I[t]] 
 
-print (V)
+# print (V)
 
 Out = [(0,0)] * len(I)
-S=[9, 12, 15]
+S=[START_CHAN_A, START_CHAN_B, START_CHAN_C]
 for t in range (len(np_new_times)):
     idxs = [i[0] for i in sorted(enumerate(S), key=lambda x:x[1])]
     if (I[t] <= 15):
@@ -209,10 +254,9 @@ for t in range (len(np_new_times)):
         S[idx] = I[t]-32
         Out[t] = (idx, S[idx])
 
-print (Out)
-
 if (1 == 1):
         
+    logging.info ("PLOT RESULT")
 
     plt.figure(1)
     plt.title("loop")
@@ -227,5 +271,12 @@ if (1 == 1):
     plt.figure(4)
     plt.plot(new_times, V, '-o' )
     plt.show()
+
+
+logging.info ("SAVE OUPUT")
+
+with open (OUTPUT_FILENAME, "w") as f:
+    f.write("Out = " + str(Out))
+
 
 print ("END")
