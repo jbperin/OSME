@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+util/__pycache__/*
+BUILD/map.htm
+BUILD/xaerr.txt
+BUILD/symbols
