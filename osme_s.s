@@ -130,16 +130,16 @@ task_fraction:
 	inc		_kernel_fraction
 	lda		_kernel_fraction
 	eor		#12
-	bne		not_beat
+	bne		skip_beat
 	sta		_kernel_fraction
 	jsr		task_beat
 
-not_beat:
-	lda		_ayReg8
+skip_beat:
+	lda		_ayReg10
 	beq		soundoff
 	sec
 	sbc		#1
-	sta		_ayReg8
+	sta		_ayReg10
 	jsr 	_ayUpdate
 soundoff:	
 taskfraction_done:

@@ -2,6 +2,10 @@
 Oric Sound and Music Engine
 
 
+http://map.tni.nl/articles/psg_sample.php
+
+
+
 ```plantuml
 @startuml
 !pragma teoz true

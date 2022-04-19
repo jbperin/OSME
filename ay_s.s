@@ -13,12 +13,12 @@ _ayReg4      .dsb 1    ; R4  : Chan C Tone Period Fine (LSB)
 _ayReg5      .dsb 1    ; R5  : Chan C Tone Period Coarse (HSB)
 _ayReg6      .dsb 1    ; R6  : Noise Period 
 _ayReg7      .dsb 1    ; R7  : Mixer 
-_ayReg8      .dsb 1    ; R8  : Chan A Amplitude 
-_ayReg9      .dsb 1    ; R9  : Chan B Amplitude
-_ayReg10     .dsb 1    ; R10 : Chan C Amplitude
-_ayReg11     .dsb 1    ; R11 : Envelope Period Fine 
-_ayReg12     .dsb 1    ; R12 : Envelope Period Coarse 
-_ayReg13     .dsb 1    ; R13 : Envelope Shape / Cycle 
+_ayReg10     .dsb 1    ; R10 : Chan A Amplitude 
+_ayReg11     .dsb 1    ; R11 : Chan B Amplitude
+_ayReg12     .dsb 1    ; R12 : Chan C Amplitude
+_ayReg13     .dsb 1    ; R13 : Envelope Period Fine 
+_ayReg14     .dsb 1    ; R14 : Envelope Period Coarse 
+_ayReg15     .dsb 1    ; R15 : Envelope Shape / Cycle 
 
 ; store precalculated values to write in via PCR for latch sequence
 ayLatch_N   .dsb 1
@@ -43,12 +43,12 @@ _ayInit:
     sta _ayReg4 
     sta _ayReg5 
     sta _ayReg6 
-    sta _ayReg8 
-    sta _ayReg9 
-    sta _ayReg10
-    sta _ayReg11
+    sta _ayReg10 
+    sta _ayReg11 
     sta _ayReg12
     sta _ayReg13
+    sta _ayReg14
+    sta _ayReg15
 
     lda #$3F    
     sta _ayReg7 
@@ -97,12 +97,12 @@ _ayUpdate:
     lda #5 : LATCH_REG_NUMBER: lda _ayReg5 : LATCH_REG_VALUE
     lda #6 : LATCH_REG_NUMBER: lda _ayReg6 : LATCH_REG_VALUE
     lda #7 : LATCH_REG_NUMBER: lda _ayReg7 : ORA #$40: LATCH_REG_VALUE
-    lda #8 : LATCH_REG_NUMBER: lda _ayReg8 : LATCH_REG_VALUE
-    lda #9 : LATCH_REG_NUMBER: lda _ayReg9 : LATCH_REG_VALUE
-    lda #10: LATCH_REG_NUMBER: lda _ayReg10: LATCH_REG_VALUE
-    lda #11: LATCH_REG_NUMBER: lda _ayReg11: LATCH_REG_VALUE
-    lda #12: LATCH_REG_NUMBER: lda _ayReg12: LATCH_REG_VALUE
-    lda #13: LATCH_REG_NUMBER: lda _ayReg13: LATCH_REG_VALUE    
+    lda #8 : LATCH_REG_NUMBER: lda _ayReg10 : LATCH_REG_VALUE
+    lda #9 : LATCH_REG_NUMBER: lda _ayReg11 : LATCH_REG_VALUE
+    lda #10: LATCH_REG_NUMBER: lda _ayReg12: LATCH_REG_VALUE
+    lda #11: LATCH_REG_NUMBER: lda _ayReg13: LATCH_REG_VALUE
+    lda #12: LATCH_REG_NUMBER: lda _ayReg14: LATCH_REG_VALUE
+    lda #13: LATCH_REG_NUMBER: lda _ayReg15: LATCH_REG_VALUE    
 
 
 ;    lda #0 : ldx _ayReg0 : jsr ayWriteRegister
@@ -113,12 +113,12 @@ _ayUpdate:
 ;    lda #5 : ldx _ayReg5 : jsr ayWriteRegister
 ;    lda #6 : ldx _ayReg6 : jsr ayWriteRegister
 ;    lda #7 : ldx _ayReg7 : jsr ayWriteRegister
-;    lda #8 : ldx _ayReg8 : jsr ayWriteRegister
-;    lda #9 : ldx _ayReg9 : jsr ayWriteRegister
-;    lda #10: ldx _ayReg10: jsr ayWriteRegister
-;    lda #11: ldx _ayReg11: jsr ayWriteRegister
-;    lda #12: ldx _ayReg12: jsr ayWriteRegister
-;    lda #13: ldx _ayReg13: jsr ayWriteRegister
+;    lda #8 : ldx _ayReg10: jsr ayWriteRegister
+;    lda #9 : ldx _ayReg11: jsr ayWriteRegister
+;    lda #10: ldx _ayReg12: jsr ayWriteRegister
+;    lda #11: ldx _ayReg13: jsr ayWriteRegister
+;    lda #12: ldx _ayReg14: jsr ayWriteRegister
+;    lda #13: ldx _ayReg15: jsr ayWriteRegister
     
 
     ; cli

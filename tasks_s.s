@@ -52,6 +52,7 @@ task100hz_done:\
 #define TASK_50Hz : .( :\
     jsr ReadKeyboard:\
     jsr detectKeyEvent:\
+    jsr stepReadScore:\
 .)
 
 
