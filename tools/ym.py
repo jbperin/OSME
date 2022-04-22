@@ -5,7 +5,7 @@ import struct
 # %osdk%\bin\bin2txt -f2 -h1 -s1 %osdk%\TMP\bach.mym  music.s _Music
 
 # http://leonard.oxg.free.fr/ymformat.html
-
+# https://github.com/skeezix/zikzak/blob/master/zik80/audio-gen/ym-file-format.txt
 # BYTE unsigned 8 bits integer
 # WORD unsigned 16 bits integer (Big Endian format)
 # LWORD unsigned 32 bits integer (Big Endian format)
@@ -30,6 +30,18 @@ import struct
 # ? NT-String ? Song comment
 # ? BYTES ? YM register data bytes. (r0,r1,r2....,r15 for each frame). Order depend on the "interleaved" bit. It takes 16*nbFrame bytes.
 # ? LWORD 4 End ID marker. Must be "End!"
+
+
+# http://leonard.oxg.free.fr/ymformat.html#ymchip
+
+#http://ym2149.org/resources/YM-format.txt
+
+
+# Archive of musics: 
+# https://bulba.untergrund.net/music_e.htm
+# https://vgmrips.net/packs/chip/ay-3-8910
+# https://www.smspower.org/uploads/Music/vgmspec160.txt
+
 
 def readNullTerminatedString(bytes_read, idx_data):
     chars = []
@@ -84,11 +96,10 @@ class YM:
             self.frames.append(theFrame)
         self.header['nbFrames'] += 1
     def _ym5decode(self, buffer):
-        self.ym6decode(buffer)
+        self._ym6decode(buffer)
     def _ym6decode(self, buffer):
         s = struct.Struct('>4s 8s I I H I H I H')
         unpacked = s.unpack(buffer[0:s.size])
-        # print (unpacked)
         self.header = {
             'idFormat':unpacked[0],
             'checkString':unpacked[1],
@@ -100,7 +111,6 @@ class YM:
             'loopFrame':unpacked[7],
             'size':unpacked[8],
         }    
-        print (self.header)
         idx_data = s.size
         idx_data , self.header['songTitle']=readNullTerminatedString(buffer, idx_data)
         idx_data , self.header['authorName']=readNullTerminatedString(buffer, idx_data)
@@ -127,9 +137,10 @@ class YM:
                         'r15': buffer[idx_data+13*self.header['nbFrames']],
                         'r16': buffer[idx_data+14*self.header['nbFrames']],
                         'r17': buffer[idx_data+15*self.header['nbFrames']]}
-                idx_data = idx_data + 16
+                idx_data = idx_data + 1
                 # print (frame)
                 self.frames.append(frame)
+            idx_data += 15*self.header['nbFrames']
         else:
             print ('non interleaved not properly  handled')
             r = struct.Struct('>B B B B B B B B B B B B B B B B')
@@ -214,15 +225,16 @@ class YM:
     def load(self,filepath):
         with open (filepath, "rb") as ficin:
             buffer = ficin.read()
-        print (buffer[0:45])
         format = struct.unpack("4s", buffer[0:4])[0].decode("utf-8")
         if format in ['YM2!', 'YM3!', 'YM4!', 'YM5!', 'YM6!']:
             print (f"Not compressed format:  {format}")
+            print (len(buffer))
         else:
             lha = lhafile.Lhafile(filepath)
             files = [info.filename for info in lha.infolist()]
             filename = files[0]
             buffer = lha.read(filename)
+            print (len(buffer))
             format = struct.unpack('4s',buffer[0:4])[0].decode("utf-8")
             if format in ['YM2!', 'YM3!', 'YM4!', 'YM5!', 'YM6!']:
                 print (f"LHA compressed format:  {format}")
@@ -255,7 +267,7 @@ def main ():
     anOtherYM.header['songComment'] = aYM.header['songComment']
     # for i in range(5):
     #     print (anOtherYM.frames[i])
-    anOtherYM.export('C:\\Perso\\myCode\\OSME\\tools\\alien_frame2.ym')
+    anOtherYM.export('C:\\Perso\\myCode\\OSME\\tools\\alien_frame_bis.ym')
 
 if __name__ == '__main__':
     main()
