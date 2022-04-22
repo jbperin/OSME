@@ -1,9 +1,9 @@
+import random
 
-import ym
 import osme
 import music 
-import random
 import euclid
+import ym
 
 Tempo = 120
 
@@ -97,8 +97,10 @@ def main ():
     def fraction(idxBeat, idxFraction):
         global eucl
         # print (f"fraction {idxBeat}.{idxFraction}")
+        # Only play on half time or full time
         if (idxFraction%6 == 0):
             if (eucl.pulse() == "Pulse"):
+                # Only play note of the chord on main tempo
                 if (idxFraction == 0):
                     idxNote = currChord[random.randrange (len(currChord))]
                     currNote = currScale[idxNote]
@@ -112,9 +114,11 @@ def main ():
         
     def t50hz(idxBeat, idxFraction):
         # print (f"t50 {idxBeat}.{idxFraction}")
+        # On last fraction before new beat, we silence sound using envoloppe to prepare next note
         if (idxFraction == 11):
             applyChange({'r10':0, 'r15':0x01})
         else:
+            # alternate note on each IT 50Hz 
             if ((idxFraction%3) == 0):
                 [coar, fin] = freq2register(music.notefrequency[currScale[currChord[0]]])
             elif ((idxFraction%3) == 1):
