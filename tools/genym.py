@@ -5,7 +5,7 @@ import music
 import euclid
 import ym
 
-Tempo = 120
+Tempo = 160
 
 class MusicGenerator ():
 
@@ -194,11 +194,11 @@ def main ():
     theOSME.regT50HzCallback(mGenerator.t50hz)
 
     #8 bars * 4 beat/bar * 60/TEMPO(bpm) * 100 pulse/sec
-    for i in range(int(16*4*(60/Tempo)*100)):
+    for i in range(int(8*4*(60/Tempo)*100)):
         theOSME.pulse100ms()
         if (i%2 == 0): aYM.addFrame(mGenerator.getFrame())
 
-    aYM.export('C:\\Perso\\myCode\\OSME\\tools\\output.ym')
+    aYM.export('C:\\Perso\\myCode\\OSME\\tools\\music.ym')
 
 if __name__ == '__main__':
     main()

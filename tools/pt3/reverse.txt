@@ -1,0 +1,72 @@
+
+INIT:
+=====
+z80_IX                  <- Z80_L, Z80_H
+MODADDR+1, MODADDR+7    <- Z80_L, Z80_H
+MDADDR2+1, MDADDR2+7    <- Z80_L, Z80_H
+PUSH                    Z80_L
+PUSH                    Z80_H
+
+z80_E                   <- 100
+z80_D                   <- 0
+Y                       <- 0
+
+Z80_L, Z80_H            +=  z80_E
+
+Delay+1                 <- Z80_H/L[Y]
+
+Z80_L, Z80_H            +=  z80_E
+CrPsPtr                 <- Z80_H/L
+
+Y                       <- 102
+z80_E                   <- Z80_IX[Y]
+
+z80_L, z80_H            +=  z80_E
+
+z80_L, z80_H            += 1
+
+s2:
+===
+LPosPtr+1/+5            <- Z80_H/L
+PULL                    Z80_D
+PULL                    Z80_E
+
+
+PatsPtr+1/+8            <- z80_IX[103/104] + z80_E/D
+
+OrnPtrs+1/+8            <- 169 + z80_E/D
+
+SamPtrs+1               <- z80_E + 105
+
+A                       <- 0
+Y                       <- VAR0END-VARS-1
+
+LOOP_LDIR:
+==========
+VARS[0:VAR0END-VARS-1]  <- 0
+
+SamPtrs+8               <- z80_D + 0
+
+SETUP                   <- SETUP & #%01111111 ; bit7 is set each time, when loop point is passed
+
+z80_E/Delay             <- T1_
+DelyCnt                 <- 1
+ANtSkCn                 <- 1
+BNtSkCn                 <- 1
+CNtSkCn                 <- 1
+
+AVolume                 <- $F0
+BVolume                 <- $F0
+CVolume                 <- $F0
+
+z80_L/Z80_H             <- #EMPTYSAMORN
+AdInPtA+1/+5            <- 
+AOrnPtr/+1              <- 
+BOrnPtr/+1              <- 
+COrnPtr/+1              <- 
+ASamPtr/+1              <- 
+BSamPtr/+1              <- 
+CSamPtr/+1              <- 
+
+Y                       <- 13
+A                       <- z80_IX[Y]

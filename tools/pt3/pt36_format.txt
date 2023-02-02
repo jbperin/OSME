@@ -1,0 +1,175 @@
+Pro Tracker v3.6x Module Format
+by Alone Coder
+
+Translation from Russian: AC (2018)
+note: offsets to module regions and their length are shown in bytes (hexadecimal/decimal numbers).
+=> xxxx : label in pt3 player z80 source code.
+
+$000/000 ($0D/13)   "ProTracker 3." identification string.
+
+$00D/013 ($01/01)   "7" (or "6", "5", "4", or even "3") the number of the exposure. => Version
+                    It should be noted that PTV3.4x and lower modules are used another, "unbalanced" volume table, and in the modules PTv3.3x
+                    Alternative frequency table "Pro Tracker" is used, not coinciding with the eponymous modern!)
+
+$00E/014 ($10/16)   " compilation of " (optional - any text of this length).
+
+$01E/030 ($20/32)   the name of the module (ASCII, lat) unused symbols fulled with spaces.
+
+$03E/062 ($04/04)   " by " (optional - any 4 characters)
+
+$042/066 ($20/32)   author's name (ASCII, lat, unused symbols fulled with spaces).
+
+$062/098 ($01/01)   " " - one space (any character).
+                    (i.e., the first 99 bytes of the module form the corresponding row)
+
+$063/099 ($01/01)   frequency table number: 0 = Pro Tracker, 1 = Sound Tracker, 2 = ASM or PSC, 3 = RealSound. 
+                    The label occupies 192 bytes and contains the values ​​of the periods for 96 notes starting from C-1 (up to the first octave).
+                    The period is the value inverse to the frequency of the note placed in the corresponding registers AY. 
+                    The lower bytes (here and below, behind one the exception to be indicated) are kept first. 
+                    Compiler PT stores the table corresponding to the module in the player's body by relative to address 512. 
+                    It stores the volume table in that same body of the player at a relative address 256.
+
+$064/100 ($01/01)   Tempo value. => Delay
+
+$065/101 ($01/01)   song end (1 = only one item in the module) - not used in the player.
+
+$066/102 ($01/01)   song loop (0 = loop to the beginning).
+
+$067/103 ($02/02)   Psa_chn = offset from the beginning of the module to the table of patterns. => PatsPtr
+
+$069/105 ($20*2)    offsets from the beginning of the module to the samples, starting with the zero- => SamPtrs
+         (32*2)     left sample. Two bytes per sample. Zero sample in current
+                    versions of the editor is not used. For all unused samples offset is zero.
+
+$0A9/169 ($10*2)    offsets from the beginning of the module to the ornaments, starting with zero. => OrnPtrs
+         (16*2)     Two bytes per ornament. Null ornament is a lack of ornament, so the data of this ornament (see below) contain 0,1,0. 
+                    You can use this ornament at your discretion, BUT then in the song it will be impossible to use samples without ornaments. 
+                    For of all unused ornaments, the offset is zero.
+
+$0C9/201 (?)        List of items (in play order): contains pattern numbers (0 ... 84) multiplied by 3. 
+                    The table ends with the code #ff. 
+                    Pro Tracker v3.3x-v3.5x does not support more than 42 patterns.
+                    Pro Tracker v3.6x does not support more than 46 patterns.
+                    Pro Tracker v3.7 ?
+
++ Psa_chn (?*6)     A pattern pointer. 
+                    Contains for each of the displacement Patterns:
+                    ++ 0 (2) to the channel data block (track) A
+                    ++ 2 (2) to the channel data block (track) B
+                    ++ 4 (2) to the channel data block (track) C.
+                    The noise offset data (a separate column in the editor) are fed to channel B.
+
++ ? (? *?)          blocks of data channels, that is, tracks.
+
+
+The track contains the following data:
+================================================== ==============
+$00 - the end of the track.
+$01, delay, Lsl, Hsl - the Gliss (Slide) effect up or down. Delay
+ - time in fiftieths of a second, after which to
+ the value of Lsl + 256 * Hsl will be added to the period of the note. Bias
+ The player accumulates in the corresponding variable and adds
+ After the frequency of the note is formed, ie,
+ sya line of ornament, and only then ...
+$02, delay, Lmax, Hmax, Lsl, Hsl - the Tone Portamento effect
+ or down. Delay is the time in fiftieths of a second, after the expiration
+ which by the period of the note will be added the value Lsl + 256 * Hsl.
+ Lmax + 256 * Hmax - the maximum displacement (unsigned), after-
+ The accumulation of which should be discontinued Portamento (in PT3.6x not
+ is used, because possibly incorrect direction indication).
+$03, offset - sample offset. The sample does not start playing again.
+$04, offset - ornament offset. Ornament begins to play not sleep-
+ chala.
+$05, YEStime, NOtime - vibrate. a note that sounds, it does not sound.
+$08, delay, Lsl, Hsl - the effect of the slide envelope. To the value of the period
+ The envelope is added Lsl + 256 * Hsl from time to time.
+$09, tempo - specify the tempo (in interruptions per line). Standard-
+ player less tempo = 2 does not play.
+NB: effect paramements (# 0x) do not immediately follow the code of the number
+effect, and AFTER THE END OF THE LINE !!! If several ef-
+fect on one note (in fact, it does not happen), then first le-
+zate paramentment of the last effect, then the penultimate and so yes-
+More ...
+
+$10, smp * 2 - turn off the envelope, put the 0th ornament and
+ change the sample number.
+$1x, Henv, Lenv, smp * 2 - change the sample number, put the 0th
+ ornament and include envelope type x-1 with a period
+ Lenv + 256 * Henv. When the envelope is turned on, it is initialized,
+ those. a new period begins!
+$20-$3f - specify the noise offset (only in channel B)
+$4x - specify the ornament number x.
+ (the envelope does not turn off)
+$50-$AF - specify the height of the note and FINISH the analysis of the current line
+ channel.
+$B0 - turn off Envelope.
+$B1, lines - do not analyze the channel during lines lines.
+ (lines = 1 corresponds to one line). Acts not only on
+ the gap between this and the next note, but also further, until
+ indicated friend
+$Bx, Henv, Lenv - the same as # 1x, but without the sample. That is simply
+ Enable the envelope type x-1 with the specified period.
+$Cv - specify the volume. (V = 0 - pause and FINISH line analysis.)
+$D0 - FINISH the line analysis.
+$D1-$EF - specify the sample number.
+$Fx, smp * 2 - specify ornament number (x) and sample number.
+ (the envelope is turned off)
+================================================== ==============
+
++? (? * (? * 4 + 2)) - samples.
+   ++ 0 (1) - loop
+   ++ 1 (1) - end (1 = sample from one line)
+   ++ 2 (? * 4) - the data:
+      +++ 0 (1) sv + - N4 N3 N2 N1 N0 Em
+      +++ 1 (1) Nm ts ns Tm V3 V2 V1 V0
+ sv = 1 - a sign of the driving down of loudness, + - = 1 corresponds to its increase
+ training; N4-0 is the noise frequency OR the shift of the envelope (depends on
+ presence of a noise mask): offset envelope 0-15 - down, 16-31 -
+ up (N4 is interpreted as a sign); V3-0 - volume; Tn, Nm,
+ Em - masks of tone, noise and envelope respectively, and if the mask of the ra-
+ in the unit, then the corresponding sound element is turned off; ts, ns = 1
+ - signs that the current offset of the tone or noise / envelope
+ will be remembered.
+      +++ 2 (2) the shift of the tone period (positive - up,
+ down).
+
++? (? * (? + 2)) are ornaments.
+   ++ 0 (1) - loop
+   ++ 1 (1) - end (1 = ornament from one line)
+   ++ 2 (?) - data: bias in semitones (0 = no bias, polo-
+ The positive displacement is up, the negative is down).
+
+waiting for additions!
+
+Additions from 10.xi.02:
+1. (Sergey Bulba): The ASM or PSC table has nothing to do with the corresponding
+ed editors. Modules from these editors follow the
+With the Sound Tracker table. Table ASM or PSC calculated
+on so that at the clock frequency AY 1.7744 MHz notes in the editor
+coincided with the piano notes of the same name. (Table Real Sound
+- similarly, but for 1.75 MHz.)
+2. The module can also use the 0-th sample, if in the track it
+is stored together with the ornament (can be zero). A total of 32 samples.
+3. Information about Portamento, Loop and # B1 has been checked.
+4. Fixed information about the samples.
+Update as of 24.ii.03:
+5. It is supplemented with the exception of the envelope.
+Update as of 25.iii.03:
+6. Standard PTv3.6x - 46 patterns.
+7. When the ornament is shifted downward (more precisely, with the nega-
+the lowest note C-1 is substituted. When
+overflow up the result is not defined.
+Update as of 26.vii.03:
+8. The changes for PT3.6x are specified above.
+9. The maximum size of the module that can be downloaded in the editor-
+tor, is # 3300 bytes, or # 4000 bytes for the "cjf" version.
+Update as of 20.iii.04:
+10. PT3 + 67 has 48 patterns, but it is not guaranteed that they will be
+the same in all subsequent versions.
+Update as of 29.vi.04:
+11. See Pro # 10 and # B1.
+12. in PT3.69 you can specify the number of the ornament without affecting the
+envelope. in VTII while it is impossible. all players play this.
+Addition from 26.viii.04:
+13. On the lines of the sample where the noise is included, the accumulated offset
+The envelope is ignored.
