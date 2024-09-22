@@ -198,7 +198,7 @@ def main ():
         theOSME.pulse100ms()
         if (i%2 == 0): aYM.addFrame(mGenerator.getFrame())
 
-    aYM.export('C:\\Perso\\myCode\\OSME\\tools\\music.ym')
+    aYM.export('C:\\Users\\tbpk7658\\Documents\\repos\\OSME\\music.ym')
 
 if __name__ == '__main__':
     main()

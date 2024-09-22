@@ -1,4 +1,4 @@
-import lhafile
+# import lhafile
 import struct
 
 # %osdk%\bin\ym2mym.exe data\bach.YM %osdk%\TMP\bach.mym
@@ -230,17 +230,18 @@ class YM:
             print (f"Not compressed format:  {format}")
             print (len(buffer))
         else:
-            lha = lhafile.Lhafile(filepath)
-            files = [info.filename for info in lha.infolist()]
-            filename = files[0]
-            buffer = lha.read(filename)
-            print (len(buffer))
-            format = struct.unpack('4s',buffer[0:4])[0].decode("utf-8")
-            if format in ['YM2!', 'YM3!', 'YM4!', 'YM5!', 'YM6!']:
-                print (f"LHA compressed format:  {format}")
-            else:
-                print (f"Unrecognized YM format ..")
-                return
+            print (f" Unable to deal with LHA compressed format")
+            # lha = lhafile.Lhafile(filepath)
+            # files = [info.filename for info in lha.infolist()]
+            # filename = files[0]
+            # buffer = lha.read(filename)
+            # print (len(buffer))
+            # format = struct.unpack('4s',buffer[0:4])[0].decode("utf-8")
+            # if format in ['YM2!', 'YM3!', 'YM4!', 'YM5!', 'YM6!']:
+            #     print (f"LHA compressed format:  {format}")
+            # else:
+            #     print (f"Unrecognized YM format ..")
+            #     return
         if (format == 'YM2!'):
             pass
         elif (format == 'YM3!'):

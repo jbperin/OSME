@@ -81,16 +81,16 @@ class OSME:
 def main ():
 
     theOSME = OSME()
-    theOSME.setTempo(240)
+    theOSME.setTempo(110)
 
     def beat(idxBeat):
-        print (f"beat {idxBeat}")
+        print (f"\tbeat {idxBeat}")
 
     def fraction(idxBeat, idxFraction):
-        print (f"fraction {idxBeat}.{idxFraction}")
+        print (f"\tfraction {idxBeat}.{idxFraction}")
 
     def t50hz(idxBeat, idxFraction):
-        print (f"t50 {idxBeat}.{idxFraction}")
+        print (f"\tt50 {idxBeat}.{idxFraction}")
 
     theOSME.regBeatCallback(beat)
     theOSME.regFractionCallback(fraction)
