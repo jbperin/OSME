@@ -41,7 +41,7 @@
 *.su
 *.idb
 *.pdb
-
+*.pyc
 # Kernel Module Compile Results
 *.mod*
 *.cmd
@@ -54,3 +54,4 @@ util/__pycache__/*
 BUILD/map.htm
 BUILD/xaerr.txt
 BUILD/symbols
+BUILD/sound.tap
