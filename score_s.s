@@ -39,12 +39,10 @@ _ptr_Write_Reg15     .dsb 2    ; R15 : Envelope Shape / Cycle
 
 .text
 
-_ay_score            .dsb NB_GROUP*256
-_current_idx_read    .dsb 1
-_current_idx_write   .dsb 1
+_ay_score            .dsb NB_REGISTER*NB_SAMPLE
+
 _current_frame_read  .dsb 1
 _current_frame_write .dsb 1
-_current_group_write .dsb 1
 
 _initAyScore:
 .(
@@ -62,7 +60,7 @@ _initAyScore:
     lda #<(_ay_score+ 11* NB_SAMPLE): sta _ptr_Read__Reg13: sta _ptr_Write_Reg13:  lda #>(_ay_score+ 11* NB_SAMPLE): sta _ptr_Read__Reg13+1: sta _ptr_Write_Reg13+1
     lda #<(_ay_score+ 12* NB_SAMPLE): sta _ptr_Read__Reg14: sta _ptr_Write_Reg14:  lda #>(_ay_score+ 12* NB_SAMPLE): sta _ptr_Read__Reg14+1: sta _ptr_Write_Reg14+1
     lda #<(_ay_score+ 13* NB_SAMPLE): sta _ptr_Read__Reg15: sta _ptr_Write_Reg15:  lda #>(_ay_score+ 13* NB_SAMPLE): sta _ptr_Read__Reg15+1: sta _ptr_Write_Reg15+1
-    lda #0 : sta _current_idx_read: sta _current_idx_write: sta _current_frame_read: : sta _current_frame_write : sta _current_group_write
+    lda #0 : sta _current_frame_read: : sta _current_frame_write 
 .)
     rts
 
@@ -76,7 +74,7 @@ stepReadScore:
     jmp     stepReadDone
 ScoreNotEmpty
 
-    ldy     _current_idx_read
+    ldy     _current_frame_read
     lda     (_ptr_Read__Reg0 ), Y: sta     _ayReg0
     lda     (_ptr_Read__Reg1 ), Y: sta     _ayReg1 
     lda     (_ptr_Read__Reg2 ), Y: sta     _ayReg2 
@@ -96,42 +94,42 @@ ScoreNotEmpty
     jsr     _ayUpdate
 
 
-    ;; current_frame_read = (current_frame_read + 1) % NB_FRAME
+    ;; current_frame_read = (current_frame_read + 1) % NB_SAMPLE
     inc     _current_frame_read
     lda     _current_frame_read
-    cmp     #NB_FRAME
+    cmp     #NB_SAMPLE
     bne     NoRollOver
     lda     #0
     sta     _current_frame_read
 NoRollOver    
 
     
-    inc     _current_idx_read
-    lda     _current_idx_read
-    cmp     #NB_SAMPLE
-    bne     skip_modulo_18
-        lda     #0
-        sta     _current_idx_read
-        inc     _ptr_Read__Reg0+1
-        lda     _ptr_Read__Reg0+1
-        cmp     #>(_ay_score+NB_GROUP*256)
-        bne     endif_rewind
-            lda #>(_ay_score + 0 * NB_SAMPLE): sta _ptr_Read__Reg0+1
-            lda #>(_ay_score + 1 * NB_SAMPLE): sta _ptr_Read__Reg1+1
-            lda #>(_ay_score + 2 * NB_SAMPLE): sta _ptr_Read__Reg2+1
-            lda #>(_ay_score + 3 * NB_SAMPLE): sta _ptr_Read__Reg3+1
-            lda #>(_ay_score + 4 * NB_SAMPLE): sta _ptr_Read__Reg4+1
-            lda #>(_ay_score + 5 * NB_SAMPLE): sta _ptr_Read__Reg5+1
-            lda #>(_ay_score + 6 * NB_SAMPLE): sta _ptr_Read__Reg6+1
-            lda #>(_ay_score + 7 * NB_SAMPLE): sta _ptr_Read__Reg7+1
-            lda #>(_ay_score + 8 * NB_SAMPLE): sta _ptr_Read__Reg10+1
-            lda #>(_ay_score + 9 * NB_SAMPLE): sta _ptr_Read__Reg11+1
-            lda #>(_ay_score + 10* NB_SAMPLE): sta _ptr_Read__Reg12+1
-            lda #>(_ay_score + 11* NB_SAMPLE): sta _ptr_Read__Reg13+1
-            lda #>(_ay_score + 12* NB_SAMPLE): sta _ptr_Read__Reg14+1
-            lda #>(_ay_score + 13* NB_SAMPLE): sta _ptr_Read__Reg15+1
-endif_rewind 
-skip_modulo_18
+;     inc     _current_idx_read
+;     lda     _current_idx_read
+;     cmp     #NB_SAMPLE
+;     bne     skip_modulo_18
+;         lda     #0
+;         sta     _current_idx_read
+;         inc     _ptr_Read__Reg0+1
+;         lda     _ptr_Read__Reg0+1
+;         cmp     #>(_ay_score+NB_GROUP*256)
+;         bne     endif_rewind
+;             lda #>(_ay_score + 0 * NB_SAMPLE): sta _ptr_Read__Reg0+1
+;             lda #>(_ay_score + 1 * NB_SAMPLE): sta _ptr_Read__Reg1+1
+;             lda #>(_ay_score + 2 * NB_SAMPLE): sta _ptr_Read__Reg2+1
+;             lda #>(_ay_score + 3 * NB_SAMPLE): sta _ptr_Read__Reg3+1
+;             lda #>(_ay_score + 4 * NB_SAMPLE): sta _ptr_Read__Reg4+1
+;             lda #>(_ay_score + 5 * NB_SAMPLE): sta _ptr_Read__Reg5+1
+;             lda #>(_ay_score + 6 * NB_SAMPLE): sta _ptr_Read__Reg6+1
+;             lda #>(_ay_score + 7 * NB_SAMPLE): sta _ptr_Read__Reg7+1
+;             lda #>(_ay_score + 8 * NB_SAMPLE): sta _ptr_Read__Reg10+1
+;             lda #>(_ay_score + 9 * NB_SAMPLE): sta _ptr_Read__Reg11+1
+;             lda #>(_ay_score + 10* NB_SAMPLE): sta _ptr_Read__Reg12+1
+;             lda #>(_ay_score + 11* NB_SAMPLE): sta _ptr_Read__Reg13+1
+;             lda #>(_ay_score + 12* NB_SAMPLE): sta _ptr_Read__Reg14+1
+;             lda #>(_ay_score + 13* NB_SAMPLE): sta _ptr_Read__Reg15+1
+; endif_rewind 
+; skip_modulo_18
 
 ;;     inc     _current_idx_read
 ;;     lda     _current_idx_read

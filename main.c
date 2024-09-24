@@ -43,8 +43,8 @@ extern unsigned char *ptr_Write_Reg14;
 extern unsigned char *ptr_Write_Reg15;
 
 extern unsigned char current_frame_write;
-extern unsigned char current_group_write;
-extern unsigned char current_idx_write;
+extern unsigned char current_frame_read;
+// extern unsigned char current_idx_write;
 
 char message [50];
 
@@ -54,6 +54,9 @@ void jbOups();
 
 extern char ReadKey();
 extern char ReadKeyNoBounce() ;
+
+extern void initRand(unsigned int seed);
+extern unsigned char getRand(void);
 
 extern char KeyBank[8];
 
@@ -68,11 +71,11 @@ extern char KeyBank[8];
 // }
 
 void keyPressed(unsigned char c){
-	printf ("kp: %x, ", c);
+	// printf ("kp: %x, ", c);
 }
 
 void keyReleased(unsigned char c){
-	printf ("kr: %x, ", c);
+	// printf ("kr: %x, ", c);
 
 }
 
@@ -150,7 +153,48 @@ current_frame_write += 1;
 }
 
 void playScore() {
+	unsigned char ii;
+	unsigned char jj;
+	unsigned char randValue;
+	// initAyScore();
 
+	*(ptr_Write_Reg0 +current_frame_write)= 0x18 ;  // 0x18 ;  // 0x46 ; // ; R0  : Chan A Tone Period Fine (LSB)
+	*(ptr_Write_Reg1 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R1  : Chan A Tone Period Coarse (HSB)
+	*(ptr_Write_Reg2 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R2  : Chan B Tone Period Fine (LSB)
+	*(ptr_Write_Reg3 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R3  : Chan B Tone Period Coarse (HSB)
+	*(ptr_Write_Reg4 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R4  : Chan C Tone Period Fine (LSB)
+	*(ptr_Write_Reg5 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R5  : Chan C Tone Period Coarse (HSB)
+	*(ptr_Write_Reg6 +current_frame_write)= 0x1F ;  // 0x00 ;  // 0x00 ; // ; R6  : Noise Period 
+	*(ptr_Write_Reg7 +current_frame_write)= 0x3E ;  // 0x3E ;  // 0x3E ; // ; R7  : Mixer 
+	*(ptr_Write_Reg10+current_frame_write)= 0x0F ;  // 0x10 ;  // 0x00 ; // ; R8  : Chan A Amplitude 
+	*(ptr_Write_Reg11+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R9  : Chan B Amplitude
+	*(ptr_Write_Reg12+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x0F ; // ; R10 : Chan C Amplitude
+	*(ptr_Write_Reg13+current_frame_write)= 0x00 ;  // 0x00 ;  // 0xBD ; // ; R11 : Envelope Period Fine 
+	*(ptr_Write_Reg14+current_frame_write)= 0x00 ;  // 0x0F ;  // 0x28 ; // ; R12 : Envelope Period Coarse 
+	*(ptr_Write_Reg15+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x02 ; // ; R13 : Envelope Shape / Cycle 
+
+	for (ii = current_frame_write+1, jj=1;jj <50 ; ii++, jj++){
+		*(ptr_Write_Reg0 +ii)= 0x18 ;  // 0x18 ;  // 0x46 ; // ; R0  : Chan A Tone Period Fine (LSB)
+		*(ptr_Write_Reg1 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R1  : Chan A Tone Period Coarse (HSB)
+		*(ptr_Write_Reg2 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R2  : Chan B Tone Period Fine (LSB)
+		*(ptr_Write_Reg3 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R3  : Chan B Tone Period Coarse (HSB)
+		*(ptr_Write_Reg4 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R4  : Chan C Tone Period Fine (LSB)
+		*(ptr_Write_Reg5 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R5  : Chan C Tone Period Coarse (HSB)
+		*(ptr_Write_Reg6 +ii)= 0x1F ;  // 0x00 ;  // 0x00 ; // ; R6  : Noise Period 
+		*(ptr_Write_Reg7 +ii)= 0x3E ;  // 0x3E ;  // 0x3E ; // ; R7  : Mixer 
+		*(ptr_Write_Reg10+ii)=(*(ptr_Write_Reg10+ii) != 0)?(*(ptr_Write_Reg10+ii) -1):0; // = 0x0F ;  // 0x10 ;  // 0x00 ; // ; R8  : Chan A Amplitude 
+		*(ptr_Write_Reg11+ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R9  : Chan B Amplitude
+		*(ptr_Write_Reg12+ii)= 0x00 ;  // 0x00 ;  // 0x0F ; // ; R10 : Chan C Amplitude
+		*(ptr_Write_Reg13+ii)= 0x00 ;  // 0x00 ;  // 0xBD ; // ; R11 : Envelope Period Fine 
+		*(ptr_Write_Reg14+ii)= 0x00 ;  // 0x0F ;  // 0x28 ; // ; R12 : Envelope Period Coarse 
+		*(ptr_Write_Reg15+ii)= 0x00 ;  // 0x00 ;  // 0x02 ; // ; R13 : Envelope Shape / Cycle 
+	}
+	current_frame_write = (current_frame_write+jj)%NB_SAMPLE;
+	
+	randValue = getRand();
+
+	printf("wr: %d",randValue);
+	
 }
 void main()
 {
@@ -164,7 +208,7 @@ void main()
 	osmeInit();
 	ayInit();
 	initAyScore();
-
+	initRand(deek(0x276));
 	for (ii=0; ii< 2000; ii++){
 		if ((k = key()) == 'Q') break;
         else if (k == '+') setTempo(getTempo()+1);
@@ -190,10 +234,11 @@ void main()
 		AdvancedPrint(10,0,message);
 		sprintf(message, "%d.%d   ",kernel_beat,  kernel_fraction);
 		AdvancedPrint(20,0,message);
-		sprintf(message, "%d  %d  ",getTempo(), nbE_keybuf);
+		// sprintf(message, "%d  %d  ",getTempo(), nbE_keybuf);
+		sprintf(message, "%d  %d  ",current_frame_read, current_frame_write);
 		AdvancedPrint(30,0,message);
 
-		dump_matrix();
+		// dump_matrix();
 
 	}
 
