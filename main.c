@@ -43,6 +43,7 @@ extern unsigned char *ptr_Write_Reg14;
 extern unsigned char *ptr_Write_Reg15;
 
 extern unsigned char current_frame_write;
+extern unsigned char current_end_write;
 extern unsigned char current_frame_read;
 // extern unsigned char current_idx_write;
 
@@ -151,52 +152,6 @@ void note (){
 current_frame_write += 1;
 
 }
-
-void playScore() {
-	unsigned char ii;
-	unsigned char jj;
-	unsigned char randValue;
-	// initAyScore();
-	
-	*(ptr_Write_Reg0 +current_frame_write)= 0x18 ;  // 0x18 ;  // 0x46 ; // ; R0  : Chan A Tone Period Fine (LSB)
-	*(ptr_Write_Reg1 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R1  : Chan A Tone Period Coarse (HSB)
-	*(ptr_Write_Reg2 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R2  : Chan B Tone Period Fine (LSB)
-	*(ptr_Write_Reg3 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R3  : Chan B Tone Period Coarse (HSB)
-	*(ptr_Write_Reg4 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R4  : Chan C Tone Period Fine (LSB)
-	*(ptr_Write_Reg5 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R5  : Chan C Tone Period Coarse (HSB)
-	*(ptr_Write_Reg6 +current_frame_write)= 0x1F ;  // 0x00 ;  // 0x00 ; // ; R6  : Noise Period 
-	*(ptr_Write_Reg7 +current_frame_write)= 0x3E ;  // 0x3E ;  // 0x3E ; // ; R7  : Mixer 
-	*(ptr_Write_Reg10+current_frame_write)= 0x0F ;  // 0x10 ;  // 0x00 ; // ; R8  : Chan A Amplitude 
-	*(ptr_Write_Reg11+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R9  : Chan B Amplitude
-	*(ptr_Write_Reg12+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x0F ; // ; R10 : Chan C Amplitude
-	*(ptr_Write_Reg13+current_frame_write)= 0x00 ;  // 0x00 ;  // 0xBD ; // ; R11 : Envelope Period Fine 
-	*(ptr_Write_Reg14+current_frame_write)= 0x00 ;  // 0x0F ;  // 0x28 ; // ; R12 : Envelope Period Coarse 
-	*(ptr_Write_Reg15+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x02 ; // ; R13 : Envelope Shape / Cycle 
-
-	for (ii = (current_frame_write+1)%NB_SAMPLE, jj=1;jj <50 ; ii++, jj++){
-		*(ptr_Write_Reg0 +ii)= 0x18 ;  // 0x18 ;  // 0x46 ; // ; R0  : Chan A Tone Period Fine (LSB)
-		*(ptr_Write_Reg1 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R1  : Chan A Tone Period Coarse (HSB)
-		*(ptr_Write_Reg2 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R2  : Chan B Tone Period Fine (LSB)
-		*(ptr_Write_Reg3 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R3  : Chan B Tone Period Coarse (HSB)
-		*(ptr_Write_Reg4 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R4  : Chan C Tone Period Fine (LSB)
-		*(ptr_Write_Reg5 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R5  : Chan C Tone Period Coarse (HSB)
-		*(ptr_Write_Reg6 +ii)= 0x1F ;  // 0x00 ;  // 0x00 ; // ; R6  : Noise Period 
-		*(ptr_Write_Reg7 +ii)= 0x3E ;  // 0x3E ;  // 0x3E ; // ; R7  : Mixer 
-		*(ptr_Write_Reg10+ii)=(*(ptr_Write_Reg10+ii) != 0)?(*(ptr_Write_Reg10+ii) -1):0; // = 0x0F ;  // 0x10 ;  // 0x00 ; // ; R8  : Chan A Amplitude 
-		*(ptr_Write_Reg11+ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R9  : Chan B Amplitude
-		*(ptr_Write_Reg12+ii)= 0x00 ;  // 0x00 ;  // 0x0F ; // ; R10 : Chan C Amplitude
-		*(ptr_Write_Reg13+ii)= 0x00 ;  // 0x00 ;  // 0xBD ; // ; R11 : Envelope Period Fine 
-		*(ptr_Write_Reg14+ii)= 0x00 ;  // 0x0F ;  // 0x28 ; // ; R12 : Envelope Period Coarse 
-		*(ptr_Write_Reg15+ii)= 0x00 ;  // 0x00 ;  // 0x02 ; // ; R13 : Envelope Shape / Cycle 
-	}
-	current_frame_write = (current_frame_write+jj)%NB_SAMPLE;
-	
-	randValue = getRand();
-
-	printf("wr: %d",randValue);
-	
-}
-
 
 #include "music.c"
 
@@ -367,6 +322,68 @@ unsigned char randrange(unsigned char rmin, unsigned char rmax ){
     return (unsigned char) (getRand() % (rmax - rmin + 1))+rmin;
 }
 
+
+
+void playScore() {
+	unsigned char ii;
+	unsigned char jj;
+	unsigned char randValue;
+	// initAyScore();
+	
+	// *(ptr_Write_Reg0 +current_frame_write)= 0x18 ;  // 0x18 ;  // 0x46 ; // ; R0  : Chan A Tone Period Fine (LSB)
+	// *(ptr_Write_Reg1 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R1  : Chan A Tone Period Coarse (HSB)
+	// *(ptr_Write_Reg2 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R2  : Chan B Tone Period Fine (LSB)
+	// *(ptr_Write_Reg3 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R3  : Chan B Tone Period Coarse (HSB)
+	// *(ptr_Write_Reg4 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R4  : Chan C Tone Period Fine (LSB)
+	// *(ptr_Write_Reg5 +current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R5  : Chan C Tone Period Coarse (HSB)
+	// *(ptr_Write_Reg6 +current_frame_write)= 0x1F ;  // 0x00 ;  // 0x00 ; // ; R6  : Noise Period 
+	// *(ptr_Write_Reg7 +current_frame_write)= 0x3E ;  // 0x3E ;  // 0x3E ; // ; R7  : Mixer 
+	// *(ptr_Write_Reg10+current_frame_write)= 0x0F ;  // 0x10 ;  // 0x00 ; // ; R8  : Chan A Amplitude 
+	// *(ptr_Write_Reg11+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R9  : Chan B Amplitude
+	// *(ptr_Write_Reg12+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x0F ; // ; R10 : Chan C Amplitude
+	// *(ptr_Write_Reg13+current_frame_write)= 0x00 ;  // 0x00 ;  // 0xBD ; // ; R11 : Envelope Period Fine 
+	// *(ptr_Write_Reg14+current_frame_write)= 0x00 ;  // 0x0F ;  // 0x28 ; // ; R12 : Envelope Period Coarse 
+	// *(ptr_Write_Reg15+current_frame_write)= 0x00 ;  // 0x00 ;  // 0x02 ; // ; R13 : Envelope Shape / Cycle 
+
+	// for (ii = (current_frame_write+1)%NB_SAMPLE, jj=1;jj <50 ; ii++, jj++){
+	// 	*(ptr_Write_Reg0 +ii)= 0x18 ;  // 0x18 ;  // 0x46 ; // ; R0  : Chan A Tone Period Fine (LSB)
+	// 	*(ptr_Write_Reg1 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R1  : Chan A Tone Period Coarse (HSB)
+	// 	*(ptr_Write_Reg2 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R2  : Chan B Tone Period Fine (LSB)
+	// 	*(ptr_Write_Reg3 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R3  : Chan B Tone Period Coarse (HSB)
+	// 	*(ptr_Write_Reg4 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R4  : Chan C Tone Period Fine (LSB)
+	// 	*(ptr_Write_Reg5 +ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R5  : Chan C Tone Period Coarse (HSB)
+	// 	*(ptr_Write_Reg6 +ii)= 0x1F ;  // 0x00 ;  // 0x00 ; // ; R6  : Noise Period 
+	// 	*(ptr_Write_Reg7 +ii)= 0x3E ;  // 0x3E ;  // 0x3E ; // ; R7  : Mixer 
+	// 	*(ptr_Write_Reg10+ii)=(*(ptr_Write_Reg10+ii) != 0)?(*(ptr_Write_Reg10+ii) -1):0; // = 0x0F ;  // 0x10 ;  // 0x00 ; // ; R8  : Chan A Amplitude 
+	// 	*(ptr_Write_Reg11+ii)= 0x00 ;  // 0x00 ;  // 0x00 ; // ; R9  : Chan B Amplitude
+	// 	*(ptr_Write_Reg12+ii)= 0x00 ;  // 0x00 ;  // 0x0F ; // ; R10 : Chan C Amplitude
+	// 	*(ptr_Write_Reg13+ii)= 0x00 ;  // 0x00 ;  // 0xBD ; // ; R11 : Envelope Period Fine 
+	// 	*(ptr_Write_Reg14+ii)= 0x00 ;  // 0x0F ;  // 0x28 ; // ; R12 : Envelope Period Coarse 
+	// 	*(ptr_Write_Reg15+ii)= 0x00 ;  // 0x00 ;  // 0x02 ; // ; R13 : Envelope Shape / Cycle 
+	// }
+	// current_frame_write = (current_frame_write+jj)%NB_SAMPLE;
+	
+	// randValue = getRand();
+
+	// printf("wr: %d",randValue);
+	
+    
+
+
+}
+
+void prepare_1s_music(){
+    unsigned char ii;
+    for (ii = 0; ii < 100; ii++) {
+        if (ii % 2 == 0) {
+            // printf ("\n%d %d %d %d ",tmp_kernel_s, tmp_kernel_cs, tmp_kernel_beat, tmp_kernel_fraction);
+            stepWriteScore();
+        }
+        pulse100ms();
+    }
+    current_end_write = current_frame_write;
+}
+
 void main()
 {
 	int ii;
@@ -378,20 +395,30 @@ void main()
 	kernelInit();
 	osmeInit();
 	ayInit();
+
+    fraction_callback       = myFraction;
+    beat_callback           = myBeat;
+    t50hz_callback          = myIt50Hz;
+    initCurrentFrame();
+    simuInit();
+    simuSetTempo(getTempo());
 	initAyScore();
+    initMusic  ();
 	initRand(deek(0x276));
+
 	for (ii=0; ii< 2000; ii++){
 		if ((k = key()) == 'Q') break;
         else if (k == '+') setTempo(getTempo()+1);
         else if (k == '-') setTempo(getTempo()-1);
 		else if (k == 'N') note();
 		else if (k == 'P') {
-			simuSetTempo(getTempo());
+			
 			playScore();
 		} else if (k != 0) printf("%c %d \n",k,( unsigned char ) k);
 		if (tps != kernel_s) {
 			// note ();
 			tps = kernel_s;
+            prepare_1s_music();
 		}
 
 		lsys();

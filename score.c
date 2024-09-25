@@ -81,12 +81,12 @@ extern void initAyScore(void);
 
 
 void stepWriteScore () {
-    printf ("0x%02x%02x %02d, 0x%02x%02x %02d, 0x%02x%02x %02d, 0x%02x%02x %02d %02x %02d",
-        curr_frame[R1],curr_frame[R0],curr_frame[R10],
-        curr_frame[R3],curr_frame[R2],curr_frame[R11],
-        curr_frame[R5],curr_frame[R4],curr_frame[R12],
-        curr_frame[R13],curr_frame[R14], curr_frame[R6],curr_frame[R7],curr_frame[R15]
-    );
+    // printf ("0x%02x%02x %02d, 0x%02x%02x %02d, 0x%02x%02x %02d, 0x%02x%02x %02d %02x %02d",
+    //     curr_frame[R1],curr_frame[R0],curr_frame[R10],
+    //     curr_frame[R3],curr_frame[R2],curr_frame[R11],
+    //     curr_frame[R5],curr_frame[R4],curr_frame[R12],
+    //     curr_frame[R13],curr_frame[R14], curr_frame[R6],curr_frame[R7],curr_frame[R15]
+    // );
     ptr_Write_Reg0[current_frame_write] = curr_frame[R0];
     ptr_Write_Reg1[current_frame_write] = curr_frame[R1];
     ptr_Write_Reg2[current_frame_write] = curr_frame[R2];

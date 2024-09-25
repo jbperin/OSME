@@ -1,5 +1,5 @@
 
-#define DEFAULT_BPM		100
+#define DEFAULT_BPM		120
 #define NB_INT_PER_MINUTE	6000 
 
 _kernel_tempo 			.byt	DEFAULT_BPM

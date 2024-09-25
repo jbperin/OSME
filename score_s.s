@@ -43,6 +43,7 @@ _ay_score            .dsb NB_REGISTER*NB_SAMPLE
 
 _current_frame_read  .dsb 1
 _current_frame_write .dsb 1
+_current_end_write .dsb 1
 
 _initAyScore:
 .(
@@ -69,7 +70,7 @@ _initAyScore:
 stepReadScore:
 .(
     lda     _current_frame_read
-    cmp     _current_frame_write
+    cmp     _current_end_write
     bne     ScoreNotEmpty
     jmp     stepReadDone
 ScoreNotEmpty

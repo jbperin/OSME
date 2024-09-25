@@ -1,4 +1,4 @@
 
 #define NB_REGISTER 	14
-#define NB_SAMPLE		100
+#define NB_SAMPLE		250
 #define USE_RANDOM

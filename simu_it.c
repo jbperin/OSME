@@ -59,7 +59,7 @@ void pulse100ms(){
     }
 }
 
-void init() {
+void simuInit() {
     tmp_kernel_fraction    = 0;
     tmp_kernel_beat        = 0;
     tmp_kernel_cs          = 0;

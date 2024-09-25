@@ -5,6 +5,7 @@
 #include "config.h"
 unsigned char current_frame_write;
 unsigned char current_frame_read;
+unsigned char current_end_write;
 unsigned char ay_score[NB_REGISTER*NB_SAMPLE];     // 1 second = 50 frames/sec * 14 register/frame
 
 unsigned char *ptr_Write_Reg0 ;
@@ -182,8 +183,8 @@ void myFraction (void) {
                 currNote    = currScale[randrange (0,6)];
             }
             // [coar, fin] = self.freq2register(music.notefrequency[currNote]*2)
-            coar            = notePeriodCoarse[currScale[currChord[0]]+octave*12];
-            fin             = notePeriodFine[currScale[currChord[0]]+octave*12];
+            coar            = notePeriodCoarse[currScale[currNote]+(octave+1)*12];
+            fin             = notePeriodFine[currScale[currNote]+(octave+1)*12];
             
             // applyChange({'r4': fin, 'r5': coar, 'r12':15})
             curr_frame[R4]      = fin; // "ToneCFine",
@@ -219,8 +220,8 @@ void myBeat (void) {
         if (tmp_kernel_beat%4 == 0){
 
             // [coar, fin] = self.freq2register(music.notefrequency[self.currScale[self.currChord[0]]]//2)
-            coar            = notePeriodCoarse[currScale[currChord[0]]+octave*12];
-            fin             = notePeriodFine[currScale[currChord[0]]+octave*12];
+            coar            = notePeriodCoarse[currScale[currChord[0]]+(octave-1)*12];
+            fin             = notePeriodFine[currScale[currChord[0]]+(octave-1)*12];
 
             // self.applyChange({'r2': fin, 'r3': coar, 'r11':14})
             curr_frame[R2]      = fin;      // "ToneBFine",
@@ -252,7 +253,7 @@ int  main (int argc, char *argv[]){
     printf ("coucou\n");
     srand( time( NULL ) );
     init();
-    simuSetTempo(110);
+    simuSetTempo(120);
 
     for (ii=0; ii< 10; ii++){
         nbNoteInBar = randrange(2, 7);
@@ -274,8 +275,8 @@ int  main (int argc, char *argv[]){
         }
         pulse100ms();
     }
-    initEuclid1 (3,8,0);
-    for (ii = 0; ii < 12; ii++) {
-        printf ("\ntick %d %d", ii, pulseEuclid1 ());
-    }
+    // initEuclid1 (3,8,0);
+    // for (ii = 0; ii < 12; ii++) {
+    //     printf ("\ntick %d %d", ii, pulseEuclid1 ());
+    // }
 }
