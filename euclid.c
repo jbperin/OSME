@@ -9,7 +9,7 @@ void initEuclid1(unsigned char steps, unsigned char pulses, unsigned char offset
     eucl1_steps = steps;
     eucl1_pulses = pulses;
     eucl1_offset = offset;
-    eucl1_bucket =0;
+    eucl1_bucket = 0;
     eucl1_first = 1 ; // True
 }
 unsigned char pulseEuclid1 (){
