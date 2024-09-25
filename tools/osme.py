@@ -36,7 +36,7 @@ class OSME:
             self._task_beat()
 
     def _task_1Hz(self,):
-        pass
+        self.kernel_s       = (self.kernel_s + 1) %60
 
     def _task_50Hz(self,):
         if (self.t50hz_callback): self.t50hz_callback(self.kernel_beat, self.kernel_fraction)
@@ -81,7 +81,7 @@ class OSME:
 def main ():
 
     theOSME = OSME()
-    theOSME.setTempo(110)
+    theOSME.setTempo(120)
 
     def beat(idxBeat):
         print (f"\tbeat {idxBeat}")

@@ -106,7 +106,7 @@ class OSME:
                     self._task_25Hz()
 
 theOSME = OSME()
-theOSME.setTempo(200)
+theOSME.setTempo(120)
 
 tl = Timeloop()
 
