@@ -135,13 +135,13 @@ task_fraction:
 	jsr		task_beat
 
 skip_beat:
-	lda		_ayReg10
-	beq		soundoff
-	sec
-	sbc		#1
-	sta		_ayReg10
-	jsr 	_ayUpdate
-soundoff:	
+; 	lda		_ayReg10
+; 	beq		soundoff
+; 	sec
+; 	sbc		#1
+; 	sta		_ayReg10
+; 	jsr 	_ayUpdate
+; soundoff:	
 taskfraction_done:
 .)
     rts    
