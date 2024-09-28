@@ -2,6 +2,8 @@
 ;; Author: Jean-Baptiste PERIN 
 
 #include "via.h"
+#include "config.h"
+
 
 .zero
 
@@ -28,6 +30,23 @@ ayUnlatch   .dsb 1
 ; temporary variable
 ayTmp       .dsb 1
 
+#ifdef USE_AY_LIGHT_UPDATE
+_ayOldReg0      .dsb 1    ; R0  : Chan A Tone Period Fine (LSB)
+_ayOldReg1      .dsb 1    ; R1  : Chan A Tone Period Coarse (HSB)
+_ayOldReg2      .dsb 1    ; R2  : Chan B Tone Period Fine (LSB)
+_ayOldReg3      .dsb 1    ; R3  : Chan B Tone Period Coarse (HSB)
+_ayOldReg4      .dsb 1    ; R4  : Chan C Tone Period Fine (LSB)
+_ayOldReg5      .dsb 1    ; R5  : Chan C Tone Period Coarse (HSB)
+_ayOldReg6      .dsb 1    ; R6  : Noise Period 
+_ayOldReg7      .dsb 1    ; R7  : Mixer 
+_ayOldReg10     .dsb 1    ; R10 : Chan A Amplitude 
+_ayOldReg11     .dsb 1    ; R11 : Chan B Amplitude
+_ayOldReg12     .dsb 1    ; R12 : Chan C Amplitude
+_ayOldReg13     .dsb 1    ; R13 : Envelope Period Fine 
+_ayOldReg14     .dsb 1    ; R14 : Envelope Period Coarse 
+_ayOldReg15     .dsb 1    ; R15 : Envelope Shape / Cycle 
+#endif
+
 .text
 
 #define LATCH_REG_NUMBER     sta via_porta:lda ayLatch_N:sta via_pcr:lda ayUnlatch: sta via_pcr
@@ -49,6 +68,24 @@ _ayInit:
     sta _ayReg13
     sta _ayReg14
     sta _ayReg15
+
+#ifdef USE_AY_LIGHT_UPDATE
+    sta _ayOldReg0
+    sta _ayOldReg1
+    sta _ayOldReg2
+    sta _ayOldReg3
+    sta _ayOldReg4
+    sta _ayOldReg5
+    sta _ayOldReg6
+    sta _ayOldReg7
+    sta _ayOldReg10
+    sta _ayOldReg11
+    sta _ayOldReg12
+    sta _ayOldReg13
+    sta _ayOldReg14
+    sta _ayOldReg15
+#endif
+
 
     lda #$3F    
     sta _ayReg7 
@@ -122,7 +159,125 @@ _ayUpdate:
     
 
     ; cli
-    rts     
+    rts
+
+#ifdef USE_AY_LIGHT_UPDATE
+_ayLightUpdate:
+    lda     _ayReg0
+    cmp     _ayOldReg0
+    beq     ayReg0Updated
+    sta     _ayOldReg0
+    tax
+    lda     #0
+    jsr     ayWriteRegister
+ayReg0Updated:
+    lda     _ayReg1
+    cmp     _ayOldReg1
+    beq     ayReg1Updated
+    sta     _ayOldReg1
+    tax
+    lda     #1
+    jsr     ayWriteRegister
+ayReg1Updated:
+    lda     _ayReg2
+    cmp     _ayOldReg2
+    beq     ayReg2Updated
+    sta     _ayOldReg2
+    tax
+    lda     #2
+    jsr     ayWriteRegister
+ayReg2Updated:
+    lda     _ayReg3
+    cmp     _ayOldReg3
+    beq     ayReg3Updated
+    sta     _ayOldReg3
+    tax
+    lda     #3
+    jsr     ayWriteRegister
+ayReg3Updated:
+    lda     _ayReg4
+    cmp     _ayOldReg4
+    beq     ayReg4Updated
+    sta     _ayOldReg4
+    tax
+    lda     #4
+    jsr     ayWriteRegister
+ayReg4Updated:
+    lda     _ayReg5
+    cmp     _ayOldReg5
+    beq     ayReg5Updated
+    sta     _ayOldReg5
+    tax
+    lda     #5
+    jsr     ayWriteRegister
+ayReg5Updated:
+    lda     _ayReg6
+    cmp     _ayOldReg6
+    beq     ayReg6Updated
+    sta     _ayOldReg6
+    tax
+    lda     #6
+    jsr     ayWriteRegister
+ayReg6Updated:
+    lda     _ayReg7
+    cmp     _ayOldReg7
+    beq     ayReg7Updated
+    sta     _ayOldReg7
+    tax
+    lda     #7
+    jsr     ayWriteRegister
+ayReg7Updated:
+    lda     _ayReg10
+    cmp     _ayOldReg10
+    beq     ayReg10Updated
+    sta     _ayOldReg10
+    tax
+    lda     #8
+    jsr     ayWriteRegister
+ayReg10Updated:
+    lda     _ayReg11
+    cmp     _ayOldReg11
+    beq     ayReg11Updated
+    sta     _ayOldReg11
+    tax
+    lda     #9
+    jsr     ayWriteRegister
+ayReg11Updated:
+    lda     _ayReg12
+    cmp     _ayOldReg12
+    beq     ayReg12Updated
+    sta     _ayOldReg12
+    tax
+    lda     #10
+    jsr     ayWriteRegister
+ayReg12Updated:
+    lda     _ayReg13
+    cmp     _ayOldReg13
+    beq     ayReg13Updated
+    sta     _ayOldReg13
+    tax
+    lda     #11
+    jsr     ayWriteRegister
+ayReg13Updated:
+    lda     _ayReg14
+    cmp     _ayOldReg14
+    beq     ayReg14Updated
+    sta     _ayOldReg14
+    tax
+    lda     #12
+    jsr     ayWriteRegister
+ayReg14Updated:
+    lda     _ayReg15
+    cmp     _ayOldReg15
+    beq     ayReg15Updated
+    sta     _ayOldReg15
+    tax
+    lda     #13
+    jsr     ayWriteRegister
+ayReg15Updated:
+
+    rts  
+#endif
 
 
 ; parametre A = register number of 8912

@@ -92,8 +92,11 @@ ScoreNotEmpty
     lda     (_ptr_Read__Reg15), Y: sta     _ayReg15
 
 
+#ifdef USE_AY_LIGHT_UPDATE
+    jsr     _ayLightUpdate
+#else
     jsr     _ayUpdate
-
+#endif
 
     ;; current_frame_read = (current_frame_read + 1) % NB_SAMPLE
     inc     _current_frame_read
